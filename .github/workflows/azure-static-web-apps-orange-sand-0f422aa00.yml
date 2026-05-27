@@ -25,7 +25,7 @@ jobs:
           app_location: "/"
           api_location: ""
           app_build_command: "npm run build"
-          output_location: "dist/securecloud-eats-ui"
+          output_location: "dist/securecloud-eats-ui/browser"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
