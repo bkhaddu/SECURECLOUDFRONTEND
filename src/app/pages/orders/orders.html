@@ -1,0 +1,71 @@
+﻿<div class="page">
+  <nav class="navbar">
+    <div>
+      <h2>My Orders</h2>
+      <p>View history, open full details, and cancel eligible orders.</p>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/restaurants">Restaurants</a>
+      <a routerLink="/cart">Cart</a>
+    </div>
+  </nav>
+
+  @if (loading) {
+  <p>Loading orders...</p>
+  }
+
+  @if (!loading && orders.length === 0) {
+  <div class="card">
+    <h2>No orders found.</h2>
+    <p>You have not placed any orders yet.</p>
+    <a routerLink="/restaurants">Order Now</a>
+  </div>
+  }
+
+  @for (order of orders; track order.id) {
+  <div class="order-card">
+    <h2>Order #{{ order.id }}</h2>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Paid:</strong> {{ order.isPaid ? 'Yes' : 'No' }}</p>
+    <p><strong>Total Amount:</strong> ₹{{ order.totalAmount }}</p>
+
+    <a [routerLink]="['/map', order.id]">Track Order</a>
+    <button (click)="viewDetails(order.id)">View Details</button>
+
+    @if (canCancel(order)) {
+    <button (click)="cancelOrder(order.id)" [disabled]="actionLoadingId === order.id">
+      {{ actionLoadingId === order.id ? 'Cancelling...' : 'Cancel Order' }}
+    </button>
+    }
+  </div>
+  }
+
+  @if (detailsLoading) {
+  <div class="card">
+    <p>Loading order details...</p>
+  </div>
+  }
+
+  @if (selectedOrder) {
+  <div class="order-card">
+    <h2>Order Details #{{ selectedOrder.id }}</h2>
+    <p><strong>Status:</strong> {{ selectedOrder.status }}</p>
+    <p><strong>Date:</strong> {{ selectedOrder.createdAtUtc }}</p>
+
+    <h3>Delivery Address</h3>
+    <p>
+      {{ selectedOrder.deliveryAddress }},
+      {{ selectedOrder.deliveryCity }},
+      {{ selectedOrder.deliveryState }},
+      {{ selectedOrder.deliveryPostalCode }},
+      {{ selectedOrder.deliveryCountry }}
+    </p>
+
+    <h3>Items</h3>
+    @for (item of selectedOrder.items; track item.foodItemId) {
+    <p>{{ item.foodName }} × {{ item.quantity }} = ₹{{ item.unitPrice * item.quantity }}</p>
+    }
+  </div>
+  }
+</div>

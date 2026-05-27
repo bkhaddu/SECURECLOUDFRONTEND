@@ -1,0 +1,23 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Login</h1>
+    <p>Login to continue ordering.</p>
+
+    <input [(ngModel)]="email" placeholder="Email" type="email" />
+
+    <input [(ngModel)]="password" placeholder="Password" type="password" />
+
+    <button (click)="login()" [disabled]="loading">
+      {{ loading ? 'Logging in...' : 'Login' }}
+    </button>
+
+    <p class="error">{{ error }}</p>
+
+    <p>
+      New user?
+      <a routerLink="/register">Create Account</a>
+    </p>
+
+    <a routerLink="/restaurants">Back to Restaurants</a>
+  </div>
+</div>

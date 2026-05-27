@@ -1,0 +1,36 @@
+<div class="page">
+  <nav class="navbar">
+    <div>
+      <h2>Live Order Tracking</h2>
+      <p>Track your order using Google Maps.</p>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/restaurants">Restaurants</a>
+      <a routerLink="/orders">Orders</a>
+      <a routerLink="/cart">Cart</a>
+    </div>
+  </nav>
+
+  @if (error) {
+  <div class="card">
+    <h2>Tracking Error</h2>
+    <p>{{ error }}</p>
+  </div>
+  }
+
+  @if (tracking) {
+  <div class="card">
+    <h2>Order #{{ tracking.orderId }}</h2>
+    <p>Status: {{ tracking.status }}</p>
+    <p>Last Updated: {{ tracking.updatedAtUtc }}</p>
+    @if (etaText) {
+    <p><strong>Estimated Time of Arrival:</strong> {{ etaText }}</p>
+    }
+
+    <button (click)="simulateNextStep()">Simulate Delivery Movement</button>
+  </div>
+  }
+
+  <div id="map"></div>
+</div>

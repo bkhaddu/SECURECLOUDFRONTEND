@@ -1,0 +1,76 @@
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.navbar {
+  border-radius: 16px;
+  border: 1px solid #f2f2f2;
+  box-shadow: 0 8px 24px rgba(2, 6, 12, 0.06);
+}
+
+.navbar h2 {
+  color: #fc8019;
+}
+
+.section-title {
+  color: #282c3f;
+  margin: 22px 0 14px;
+}
+
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.food-card {
+  border: none;
+  padding: 0 0 14px;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(2, 6, 12, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.food-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(2, 6, 12, 0.14);
+}
+
+.food-card img {
+  height: 172px;
+  border-radius: 0;
+}
+
+.food-card h2,
+.food-card p,
+.food-card h3,
+.food-card button {
+  margin-left: 14px;
+  margin-right: 14px;
+}
+
+.food-card h2 {
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-size: 1.18rem;
+  color: #02060c;
+}
+
+.food-card p {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #686b78;
+}
+
+.food-card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #1ba672;
+}
+
+.food-card button {
+  width: calc(100% - 28px);
+  border-radius: 10px;
+  background: #fc8019;
+}

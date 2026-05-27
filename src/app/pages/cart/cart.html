@@ -1,0 +1,89 @@
+﻿<div class="page">
+  <nav class="navbar">
+    <div>
+      <h2>Your Cart</h2>
+      <p>Select delivery address before payment.</p>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/restaurants">Restaurants</a>
+      <a routerLink="/orders">Orders</a>
+    </div>
+  </nav>
+
+  @if (cart.length === 0) {
+  <div class="card">
+    <h2>Your cart is empty.</h2>
+    <a routerLink="/restaurants">Browse Restaurants</a>
+  </div>
+  }
+
+  @for (item of cart; track item.foodItemId) {
+  <div class="cart-item">
+    <h2>{{ item.name }}</h2>
+    <p>{{ item.category }}</p>
+    <p>&#8377;{{ item.price }} x {{ item.quantity }}</p>
+    <h3>Subtotal: &#8377;{{ item.price * item.quantity }}</h3>
+
+    <button (click)="decrease(item)">-</button>
+    <button (click)="increase(item)">+</button>
+    <button (click)="remove(item)">Remove</button>
+  </div>
+  }
+
+  @if (cart.length > 0) {
+  <div class="address-card">
+    <div class="address-panel">
+      <h2>Delivery Address</h2>
+      <p>Start typing your address and select one from Google suggestions.</p>
+
+      <label>Address</label>
+      <input id="location-input"
+             type="text"
+             placeholder="Search delivery address"
+             [(ngModel)]="deliveryAddress" />
+
+      <label>City</label>
+      <input [(ngModel)]="deliveryCity" placeholder="City" />
+
+      <div class="half-input-container">
+        <div>
+          <label>State</label>
+          <input [(ngModel)]="deliveryState" placeholder="State" />
+        </div>
+
+        <div>
+          <label>Postal Code</label>
+          <input [(ngModel)]="deliveryPostalCode" placeholder="Postal Code" />
+        </div>
+      </div>
+
+      <label>Country</label>
+      <input [(ngModel)]="deliveryCountry" placeholder="Country" />
+
+      @if (deliveryLatitude && deliveryLongitude) {
+      <p class="success">
+        Location selected: {{ deliveryLatitude }}, {{ deliveryLongitude }}
+      </p>
+      } @else {
+      <p class="error">
+        Select address from Google suggestions to enable tracking.
+      </p>
+      }
+    </div>
+
+    <div id="address-map"></div>
+  </div>
+
+  <div class="card">
+    <h2>Total: &#8377;{{ total }}</h2>
+
+    <button class="pay-button" (click)="checkout()" [disabled]="loading">
+      {{ loading ? 'Creating order...' : 'Pay Securely with Razorpay' }}
+    </button>
+
+    <button (click)="clearCart()">Clear Cart</button>
+  </div>
+  }
+</div>
+

@@ -1,0 +1,47 @@
+<div class="page">
+  <nav class="navbar">
+    <div>
+      <h2>Admin Panel</h2>
+      <p>Add food items to restaurant menus.</p>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/restaurants">Restaurants</a>
+      <a routerLink="/admin/restaurants">Add Restaurant</a>
+    </div>
+  </nav>
+
+  <div class="admin-form-card">
+    <h1>Add Menu Item</h1>
+
+    <label>Select Restaurant</label>
+    <select [(ngModel)]="restaurantId">
+      <option [ngValue]="null">Choose restaurant</option>
+
+      @for (restaurant of restaurants; track restaurant.id) {
+      <option [ngValue]="restaurant.id">
+        {{ restaurant.name }}
+      </option>
+      }
+    </select>
+
+    <label>Food Name</label>
+    <input [(ngModel)]="name" placeholder="Example: Masala Dosa" />
+
+    <label>Category</label>
+    <input [(ngModel)]="category" placeholder="Example: South Indian" />
+
+    <label>Price</label>
+    <input [(ngModel)]="price" type="number" placeholder="Example: 149" />
+
+    <label>Image URL</label>
+    <input [(ngModel)]="imageUrl" placeholder="Paste food image URL" />
+
+    <button (click)="addFoodItem()" [disabled]="loading">
+      {{ loading ? 'Adding...' : 'Add Menu Item' }}
+    </button>
+
+    <p class="success">{{ success }}</p>
+    <p class="error">{{ error }}</p>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="page">
+  <nav class="navbar">
+    <div>
+      <h2>Admin Panel</h2>
+      <p>Add new restaurants to SecureCloud Eats.</p>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/restaurants">Restaurants</a>
+      <a routerLink="/admin/food-items">Add Menu Item</a>
+    </div>
+  </nav>
+
+  <div class="admin-form-card">
+    <h1>{{ selectedRestaurantId ? 'Edit Restaurant' : 'Add Restaurant' }}</h1>
+
+    <label>Select Restaurant to Edit (optional)</label>
+    <select [(ngModel)]="selectedRestaurantId" (ngModelChange)="onSelectRestaurant()">
+      <option [ngValue]="null">Add new restaurant</option>
+      @for (restaurant of restaurants; track restaurant.id) {
+      <option [ngValue]="restaurant.id">{{ restaurant.name }}</option>
+      }
+    </select>
+
+    <label>Restaurant Name</label>
+    <input [(ngModel)]="name" placeholder="Example: Cloud Kitchen Noida" />
+
+    <label>Address</label>
+    <input [(ngModel)]="address" placeholder="Example: Sector 62, Noida" />
+
+    <label>Image URL</label>
+    <input [(ngModel)]="imageUrl" placeholder="Paste restaurant image URL" />
+
+    <label>Latitude</label>
+    <input [(ngModel)]="latitude" type="number" placeholder="Example: 28.6270" />
+
+    <label>Longitude</label>
+    <input [(ngModel)]="longitude" type="number" placeholder="Example: 77.3750" />
+
+    <button (click)="saveRestaurant()" [disabled]="loading">
+      {{ loading ? 'Saving...' : (selectedRestaurantId ? 'Update Restaurant' : 'Add Restaurant') }}
+    </button>
+
+    <p class="success">{{ success }}</p>
+    <p class="error">{{ error }}</p>
+  </div>
+</div>

@@ -1,1 +1,219 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg: #fff8f3;
+  --surface: #ffffff;
+  --surface-soft: #fff2e7;
+  --text: #1f1f26;
+  --muted: #5f6470;
+  --primary: #e23744;
+  --primary-deep: #c91f33;
+  --accent: #ff7a45;
+  --border: #ffd7c4;
+  --shadow: 0 18px 38px rgba(226, 55, 68, 0.12);
+  --radius-lg: 22px;
+  --radius-md: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top right, #ffe4d6 0, transparent 42%),
+    radial-gradient(circle at 18% 18%, #ffd7d1 0, transparent 36%),
+    linear-gradient(180deg, #fff8f3 0%, #fff 100%);
+  color: var(--text);
+}
+
+.page {
+  min-height: 100vh;
+  padding: 30px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.navbar h2 {
+  margin: 0;
+  color: var(--primary-deep);
+}
+
+.navbar p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.nav-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero {
+  margin: 30px 0;
+  padding: 42px;
+  border-radius: 28px;
+  color: #fff;
+  background: linear-gradient(120deg, var(--primary) 0%, var(--accent) 100%);
+  box-shadow: 0 26px 52px rgba(226, 55, 68, 0.28);
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  margin: 0 0 12px;
+  line-height: 1.1;
+}
+
+.section-title {
+  margin-top: 30px;
+  color: var(--primary-deep);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.card,
+.auth-card,
+.cart-item,
+.order-card,
+.food-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.food-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+a,
+button {
+  display: inline-block;
+  padding: 12px 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+a:hover,
+button:hover {
+  transform: translateY(-1px);
+  background: var(--primary-deep);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: 1px solid #ffc7ab;
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--text);
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid #ffb899;
+  border-color: #ffb899;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 30px;
+}
+
+.auth-card {
+  width: 440px;
+  max-width: 100%;
+}
+
+.error {
+  color: #b42318;
+}
+
+.success {
+  color: #117a34;
+}
+
+.pay-button {
+  background: #1b9f47;
+}
+
+.pay-button:hover {
+  background: #14803a;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-form-card {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 28px;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.admin-form-card h1 {
+  margin-top: 0;
+  color: var(--primary-deep);
+}
+
+.admin-form-card label {
+  display: block;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.admin-form-card button {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+
+  .navbar,
+  .hero {
+    padding: 18px;
+  }
+
+  .hero h1 {
+    font-size: 1.9rem;
+  }
+}

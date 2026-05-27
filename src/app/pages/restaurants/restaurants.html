@@ -1,0 +1,109 @@
+<div class="page">
+  <nav class="navbar">
+    <div class="brand-wrap">
+      <div class="brand-mark">S</div>
+      <div class="brand">
+        <h2>SecureCloud Eats</h2>
+        <p>Order food online from top restaurants near you.</p>
+      </div>
+    </div>
+    
+    <div class="nav-links">
+      <button type="button" class="location-icon-btn" (click)="toggleLocationPanel()" title="Set location" aria-label="Set location">
+        <svg class="pin-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
+        </svg>
+      </button>
+      <a routerLink="/restaurants">Restaurants</a>
+      <a routerLink="/cart">Cart</a>
+      <a routerLink="/orders">Orders</a>
+
+      @if (isAdmin) {
+      <a routerLink="/admin/restaurants">Manage Restaurants</a>
+      <a routerLink="/admin/food-items">Manage Menu</a>
+      }
+
+      <a routerLink="/login">Sign In</a>
+      <a routerLink="/register">Register</a>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </nav>
+  @if (showLocationPanel) {
+  <section class="location-header">
+    <div class="top-location">
+      <label for="top-location-input">Location</label>
+      <div class="location-row">
+        <input
+          id="top-location-input"
+          type="text"
+          placeholder="Enter your location"
+          [(ngModel)]="locationText"
+        />
+        <button type="button" class="clear-btn" (click)="clearLocation()">Clear</button>
+      </div>
+      <small>Showing restaurants within {{ radiusKm }} km</small>
+      @if (locationError) {
+      <p class="error">{{ locationError }}</p>
+      }
+    </div>
+  </section>
+  }
+
+  <section class="home-hero">
+    <p class="hero-kicker">DELIVERY IN 25-35 MINS</p>
+    <h1>Hungry? Discover best food near you</h1>
+    <p>Fast delivery, secure checkout, and live tracking.</p>
+    <div class="hero-search">
+      <input
+        type="text"
+        placeholder="Search for restaurants, cuisines, or dishes"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchInput()"
+        (keyup.enter)="searchRestaurants()"
+      />
+      <button type="button" (click)="searchRestaurants()">Search</button>
+      <button type="button" class="clear-btn" (click)="clearSearch()">Clear</button>
+    </div>
+  </section>
+
+  <h2 class="section-title">What's on your mind?</h2>
+  <section class="suggestions-strip">
+    @for (category of categories; track category.name) {
+    <button class="suggestion-chip" type="button">
+      <img [src]="category.image" [alt]="category.name" />
+      <span>{{ category.name }}</span>
+    </button>
+    }
+  </section>
+
+  <h2 class="section-title">Top restaurant chains</h2>
+
+  @if (loading) {
+  <p>Loading restaurants...</p>
+  }
+
+  @if (!loading && searchError) {
+  <p class="error">{{ searchError }}</p>
+  }
+
+  @if (!loading && restaurants.length === 0 && !searchError) {
+  <p>No restaurants found in {{ radiusKm }} km for "{{ activeSearch || searchTerm.trim() || 'selected filters' }}".</p>
+  }
+
+  <div class="restaurant-grid">
+    @for (r of restaurants; track r.id) {
+    <article class="restaurant-card">
+      <img
+        class="restaurant-cover"
+        [src]="r.imageUrl || getRestaurantImage(r.name)"
+        [alt]="r.name"
+        (error)="onRestaurantImageError($event, r.name)"
+      />
+      <h2>{{ r.name }}</h2>
+      <p class="restaurant-desc">{{ getRestaurantDescription(r.name) }}</p>
+      <p class="restaurant-address">{{ r.address }}</p>
+      <a [routerLink]="['/menu', r.id]">View Menu</a>
+    </article>
+    }
+  </div>
+</div>
