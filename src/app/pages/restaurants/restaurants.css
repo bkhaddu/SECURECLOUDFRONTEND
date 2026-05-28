@@ -320,12 +320,56 @@
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .brand-wrap {
+    align-items: flex-start;
+  }
+
+  .brand h2 {
+    font-size: 1.45rem;
+    line-height: 1.2;
+  }
+
+  .brand p {
+    font-size: 0.98rem;
+  }
+
+  .nav-links {
+    width: 100%;
+    gap: 10px 14px;
+  }
+
+  .nav-links a,
+  .nav-links button {
+    font-size: 1.02rem;
+    line-height: 1.25;
+  }
+
+  .location-icon-btn {
+    width: 36px;
+    height: 36px;
+    margin-right: 0;
+  }
+
+  .pin-icon {
+    width: 20px;
+    height: 20px;
+  }
+
   .home-hero {
     padding: 20px;
   }
 
   .hero-search {
     flex-direction: column;
+  }
+
+  .hero-search button {
+    width: 100%;
   }
 
   .section-title {
