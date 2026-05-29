@@ -39,9 +39,14 @@ export class Register {
       password: this.password
     }).subscribe({
       next: (res) => {
-        this.auth.saveAuth(res);
-        this.loading = false;
-        this.router.navigate(['/restaurants']);
+        try {
+          this.auth.saveAuth(res);
+          this.router.navigate(['/restaurants']);
+        } catch {
+          this.error = 'Registration succeeded but login data was invalid. Please login again.';
+        } finally {
+          this.loading = false;
+        }
       },
       error: (err) => {
         console.error(err);

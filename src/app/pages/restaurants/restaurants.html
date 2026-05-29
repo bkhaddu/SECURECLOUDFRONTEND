@@ -23,9 +23,13 @@
       <a routerLink="/admin/food-items">Manage Menu</a>
       }
 
+      @if (!fullName) {
       <a routerLink="/login">Sign In</a>
       <a routerLink="/register">Register</a>
+      }
+      @if (fullName) {
       <button (click)="logout()">Logout</button>
+      }
     </div>
   </nav>
   @if (showLocationPanel) {
@@ -69,8 +73,8 @@
   <h2 class="section-title">What's on your mind?</h2>
   <section class="suggestions-strip">
     @for (category of categories; track category.name) {
-    <button class="suggestion-chip" type="button">
-      <img [src]="category.image" [alt]="category.name" />
+    <button class="suggestion-chip" type="button" (click)="onCategorySelect(category.name)">
+      <img [src]="category.image" [alt]="category.name" loading="lazy" decoding="async" />
       <span>{{ category.name }}</span>
     </button>
     }
@@ -97,6 +101,8 @@
         class="restaurant-cover"
         [src]="r.imageUrl || getRestaurantImage(r.name)"
         [alt]="r.name"
+        loading="lazy"
+        decoding="async"
         (error)="onRestaurantImageError($event, r.name)"
       />
       <h2>{{ r.name }}</h2>

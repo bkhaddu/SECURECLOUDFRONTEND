@@ -32,13 +32,18 @@ export class Login {
       password: this.password
     }).subscribe({
       next: (res) => {
-        this.auth.saveAuth(res);
-        this.loading = false;
-        this.router.navigate(['/restaurants']);
+        try {
+          this.auth.saveAuth(res);
+          this.router.navigate(['/restaurants']);
+        } catch {
+          this.error = 'Login failed due to an unexpected server response.';
+        } finally {
+          this.loading = false;
+        }
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Invalid email or password.';
+        this.error = err?.error?.message || err?.error || 'Invalid email or password.';
         this.loading = false;
       }
     });

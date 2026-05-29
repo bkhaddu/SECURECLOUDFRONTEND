@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Api, Restaurant } from '../../services/api';
 import { Auth } from '../../services/auth';
+import { timeout } from 'rxjs/operators';
 
 declare var google: any;
 
@@ -53,7 +54,9 @@ export class Restaurants implements OnInit {
     this.loading = true;
     this.searchError = '';
 
-    this.api.getRestaurants(1, 100, search).subscribe({
+    this.api.getRestaurants(1, 40, search).pipe(
+      timeout(12000)
+    ).subscribe({
       next: (res) => {
         this.allRestaurants = res.items;
         this.applyFilters();
@@ -69,10 +72,16 @@ export class Restaurants implements OnInit {
 
   searchRestaurants() {
     this.activeSearch = this.searchTerm.trim();
-    this.applyFilters();
+    this.loadRestaurants(this.activeSearch);
   }
 
   onSearchInput() {
+    this.activeSearch = this.searchTerm.trim();
+    this.applyFilters();
+  }
+
+  onCategorySelect(categoryName: string) {
+    this.searchTerm = categoryName;
     this.searchRestaurants();
   }
 
@@ -83,7 +92,7 @@ export class Restaurants implements OnInit {
 
     this.searchTerm = '';
     this.activeSearch = '';
-    this.applyFilters();
+    this.loadRestaurants();
   }
 
   loadLocationConfig() {
@@ -231,14 +240,6 @@ export class Restaurants implements OnInit {
       'Baskin Robbins': 'https://logo.clearbit.com/baskinrobbins.com'
     };
 
-    const interiorImages = [
-      'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=1200&q=80'
-    ];
-
     if (brandLogoMap[name]) {
       return brandLogoMap[name];
     }
@@ -248,11 +249,11 @@ export class Restaurants implements OnInit {
 
   getInteriorFallbackImage(name: string): string {
     const interiorImages = [
-      'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=480&q=70',
+      'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=480&q=70',
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=480&q=70',
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=480&q=70',
+      'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=480&q=70'
     ];
 
     const hash = name.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);

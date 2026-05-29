@@ -14,10 +14,10 @@ interface LoginRequest {
 }
 
 interface AuthResponse {
-  token: string;
-  fullName: string;
-  email: string;
-  role: string;
+  token?: string;
+  fullName?: string;
+  email?: string;
+  role?: string;
 }
 
 @Injectable({
@@ -37,10 +37,14 @@ export class Auth {
   }
 
   saveAuth(response: AuthResponse) {
+    if (!response?.token) {
+      throw new Error('Invalid auth response: missing token.');
+    }
+
     sessionStorage.setItem('token', response.token);
-    sessionStorage.setItem('fullName', response.fullName);
-    sessionStorage.setItem('email', response.email);
-    sessionStorage.setItem('role', response.role);
+    sessionStorage.setItem('fullName', response.fullName || '');
+    sessionStorage.setItem('email', response.email || '');
+    sessionStorage.setItem('role', response.role || '');
   }
 
   getToken(): string | null {
