@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Api, Restaurant } from '../../services/api';
 import { Auth } from '../../services/auth';
-import { timeout } from 'rxjs/operators';
+import { retry, timeout } from 'rxjs/operators';
 
 declare var google: any;
 
@@ -27,6 +27,7 @@ export class Restaurants implements OnInit {
   selectedLongitude: number | null = null;
   readonly radiusKm = 30;
   showLocationPanel = false;
+  private locationAutocompleteReady = false;
 
   categories = [
     { name: 'Pizza', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=240&q=80' },
@@ -54,8 +55,9 @@ export class Restaurants implements OnInit {
     this.loading = true;
     this.searchError = '';
 
-    this.api.getRestaurants(1, 40, search).pipe(
-      timeout(12000)
+    this.api.getRestaurants(1, 60, search).pipe(
+      timeout(20000),
+      retry({ count: 1, delay: 800 })
     ).subscribe({
       next: (res) => {
         this.allRestaurants = res.items;
@@ -148,7 +150,7 @@ export class Restaurants implements OnInit {
     }
 
     const autocomplete = new google.maps.places.Autocomplete(input, {
-      fields: ['formatted_address', 'geometry'],
+      fields: ['address_components', 'formatted_address', 'geometry'],
       types: ['geocode'],
       componentRestrictions: { country: 'in' }
     });
@@ -164,8 +166,11 @@ export class Restaurants implements OnInit {
       this.selectedLatitude = place.geometry.location.lat();
       this.selectedLongitude = place.geometry.location.lng();
       this.locationError = '';
+      this.saveSelectedLocation(place);
       this.applyFilters();
     });
+
+    this.locationAutocompleteReady = true;
   }
 
   clearLocation() {
@@ -173,11 +178,59 @@ export class Restaurants implements OnInit {
     this.selectedLatitude = null;
     this.selectedLongitude = null;
     this.locationError = '';
+    localStorage.removeItem('selectedDeliveryLocation');
     this.applyFilters();
   }
 
   toggleLocationPanel() {
     this.showLocationPanel = !this.showLocationPanel;
+    if (this.showLocationPanel && !this.locationAutocompleteReady) {
+      setTimeout(() => this.initLocationAutocomplete());
+    }
+  }
+
+  useCurrentLocation() {
+    if (!navigator.geolocation) {
+      this.locationError = 'Current location is not available in this browser.';
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.selectedLatitude = position.coords.latitude;
+        this.selectedLongitude = position.coords.longitude;
+        this.locationText = 'Current location';
+        this.locationError = '';
+        localStorage.setItem('selectedDeliveryLocation', JSON.stringify({
+          address: this.locationText,
+          latitude: this.selectedLatitude,
+          longitude: this.selectedLongitude
+        }));
+        this.applyFilters();
+      },
+      () => {
+        this.locationError = 'Could not read your current location.';
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  private saveSelectedLocation(place: any) {
+    const components = place.address_components || [];
+    const getComponent = (type: string, shortName = false): string => {
+      const component = components.find((c: any) => c.types.includes(type));
+      return component ? (shortName ? component.short_name : component.long_name) : '';
+    };
+
+    localStorage.setItem('selectedDeliveryLocation', JSON.stringify({
+      address: place.formatted_address || this.locationText,
+      city: getComponent('locality') || getComponent('administrative_area_level_3') || getComponent('administrative_area_level_2'),
+      state: getComponent('administrative_area_level_1', true),
+      postalCode: getComponent('postal_code'),
+      country: getComponent('country'),
+      latitude: this.selectedLatitude,
+      longitude: this.selectedLongitude
+    }));
   }
 
   private applyFilters() {

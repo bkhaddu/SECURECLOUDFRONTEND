@@ -65,6 +65,9 @@
       <p class="success">
         Location selected: {{ deliveryLatitude }}, {{ deliveryLongitude }}
       </p>
+      <p>
+        Delivery is available only within {{ maxDeliveryDistanceKm }} km of the restaurant.
+      </p>
       } @else {
       <p class="error">
         Select address from Google suggestions to enable tracking.
@@ -79,7 +82,7 @@
     <h2>Total: &#8377;{{ total }}</h2>
 
     <button class="pay-button" (click)="checkout()" [disabled]="loading">
-      {{ loading ? 'Creating order...' : 'Pay Securely with Razorpay' }}
+      {{ loading ? 'Validating delivery...' : 'Pay Securely with Razorpay' }}
     </button>
 
     <button (click)="clearCart()">Clear Cart</button>

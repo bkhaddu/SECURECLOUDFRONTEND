@@ -43,6 +43,7 @@
           placeholder="Enter your location"
           [(ngModel)]="locationText"
         />
+        <button type="button" class="current-btn" (click)="useCurrentLocation()">Use Current</button>
         <button type="button" class="clear-btn" (click)="clearLocation()">Clear</button>
       </div>
       <small>Showing restaurants within {{ radiusKm }} km</small>

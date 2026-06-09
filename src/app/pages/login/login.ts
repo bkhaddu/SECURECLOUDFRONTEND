@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
+import { timeout } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +31,9 @@ export class Login {
     this.auth.login({
       email: this.email,
       password: this.password
-    }).subscribe({
+    }).pipe(
+      timeout(20000)
+    ).subscribe({
       next: (res) => {
         try {
           this.auth.saveAuth(res);
@@ -43,7 +46,9 @@ export class Login {
       },
       error: (err) => {
         console.error(err);
-        this.error = err?.error?.message || err?.error || 'Invalid email or password.';
+        this.error = err?.name === 'TimeoutError'
+          ? 'Login is taking too long. Please try again in a moment.'
+          : err?.error?.message || err?.error || 'Invalid email or password.';
         this.loading = false;
       }
     });

@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Api } from '../../services/api';
 import { Auth } from '../../services/auth';
+import { retry, timeout } from 'rxjs/operators';
 
 declare var Razorpay: any;
 declare var google: any;
@@ -30,6 +31,8 @@ export class Cart implements OnInit, AfterViewInit {
   addressSelected = false;
   map: any;
   marker: any;
+  readonly maxDeliveryDistanceKm = 30;
+  deliveryDistanceKm: number | null = null;
 
   constructor(
     private api: Api,
@@ -39,6 +42,7 @@ export class Cart implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.loadCart();
+    this.loadSavedDeliveryLocation();
   }
 
   ngAfterViewInit(): void {
@@ -92,6 +96,27 @@ export class Cart implements OnInit, AfterViewInit {
   clearCart() {
     localStorage.removeItem('cart');
     this.loadCart();
+  }
+
+  loadSavedDeliveryLocation(): void {
+    const savedLocation = localStorage.getItem('selectedDeliveryLocation');
+    if (!savedLocation) {
+      return;
+    }
+
+    try {
+      const location = JSON.parse(savedLocation);
+      this.deliveryAddress = location.address || this.deliveryAddress;
+      this.deliveryCity = location.city || this.deliveryCity;
+      this.deliveryState = location.state || this.deliveryState;
+      this.deliveryPostalCode = location.postalCode || this.deliveryPostalCode;
+      this.deliveryCountry = location.country || this.deliveryCountry;
+      this.deliveryLatitude = Number.isFinite(Number(location.latitude)) ? Number(location.latitude) : this.deliveryLatitude;
+      this.deliveryLongitude = Number.isFinite(Number(location.longitude)) ? Number(location.longitude) : this.deliveryLongitude;
+      this.addressSelected = this.deliveryLatitude !== null && this.deliveryLongitude !== null;
+    } catch {
+      localStorage.removeItem('selectedDeliveryLocation');
+    }
   }
 
   loadGoogleMapsScript(): Promise<void> {
@@ -171,6 +196,7 @@ export class Cart implements OnInit, AfterViewInit {
       this.fillAddress(place);
       this.renderAddress(place);
       this.addressSelected = true;
+      this.saveDeliveryLocation();
     });
   }
 
@@ -201,6 +227,18 @@ export class Cart implements OnInit, AfterViewInit {
 
     this.deliveryLatitude = place.geometry.location.lat();
     this.deliveryLongitude = place.geometry.location.lng();
+  }
+
+  saveDeliveryLocation(): void {
+    localStorage.setItem('selectedDeliveryLocation', JSON.stringify({
+      address: this.deliveryAddress,
+      city: this.deliveryCity,
+      state: this.deliveryState,
+      postalCode: this.deliveryPostalCode,
+      country: this.deliveryCountry,
+      latitude: this.deliveryLatitude,
+      longitude: this.deliveryLongitude
+    }));
   }
 
   renderAddress(place: any): void {
@@ -263,7 +301,47 @@ export class Cart implements OnInit, AfterViewInit {
     };
 
     this.loading = true;
+    this.validateDeliveryDistanceAndCreateOrder(restaurantId, payload);
+  }
 
+  validateDeliveryDistanceAndCreateOrder(restaurantId: number, payload: unknown): void {
+    this.api.getRestaurants(1, 100, '').pipe(
+      timeout(20000),
+      retry({ count: 1, delay: 800 })
+    ).subscribe({
+      next: (res) => {
+        const restaurant = res.items.find((item) => item.id === restaurantId);
+
+        if (!restaurant) {
+          this.loading = false;
+          alert('Could not validate restaurant location. Please try again.');
+          return;
+        }
+
+        this.deliveryDistanceKm = this.distanceKm(
+          Number(restaurant.latitude),
+          Number(restaurant.longitude),
+          Number(this.deliveryLatitude),
+          Number(this.deliveryLongitude)
+        );
+
+        if (this.deliveryDistanceKm > this.maxDeliveryDistanceKm) {
+          this.loading = false;
+          alert(`Delivery address is ${this.deliveryDistanceKm.toFixed(1)} km from ${restaurant.name}. Orders are allowed only within ${this.maxDeliveryDistanceKm} km.`);
+          return;
+        }
+
+        this.createOrder(payload);
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+        alert('Could not validate delivery distance. Please try again.');
+      }
+    });
+  }
+
+  createOrder(payload: unknown): void {
     this.api.createOrder(payload).subscribe({
       next: (orderResponse) => {
         this.loading = false;
@@ -281,6 +359,19 @@ export class Cart implements OnInit, AfterViewInit {
         }
       }
     });
+  }
+
+  private distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const toRad = (value: number) => value * (Math.PI / 180);
+    const earthRadiusKm = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2)
+      + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
+      * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return earthRadiusKm * c;
   }
 
   openRazorpay(orderResponse: any) {
